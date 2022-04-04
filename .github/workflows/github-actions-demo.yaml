@@ -1,0 +1,41 @@
+name: My first Github Workflow
+on: [push]
+jobs:
+  Check-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CI/CD Pipeline job number one starts"
+      - run: echo "Installing Docker"
+      - run: |
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+          sudo apt-get update
+          sudo apt-get install docker-ce
+      - run: echo "Checking Docker version"
+      - run: docker --version
+      - run: echo "Checking Python version"
+      - run: python3 --version
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+  Check-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CI/CD Pipeline job number two starts"
+      - run: echo "Installing Pylint"
+      - run: |
+          python -m pip install --upgrade pip
+          pip install pylint
+      - run: echo "Checking formatting with Pylint"
+      - run: find . -name '*.py' -exec pylint {} \;
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+  Build-app-image:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CI/CD Pipeline job number three starts"
+      - run: echo "Building app image"
+      - run: find . -name "Dockerfile" -exec docker build --tag test-flask-app . {} \;
+      - name: Check out repository code
+        uses: actions/checkout@v3
